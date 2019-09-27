@@ -1,0 +1,17 @@
+This example shows that Blueprint-level dependencies between modules are not
+"magically" translated into Ninja-level dependencies between build targets.
+
+In this example, module_foo depends on module_bar. However, building targets of
+module_foo does not imply building all targets of module_bar as prerequisites:
+only those targets which are inputs to build rules in module_foo are built.
+
+Namely, module_foo has a build rule that creates file foo. This build rule
+has another file bar2 as input. Module module_bar has two build rules that
+create files bar1 and bar2. When building foo, only bar2 is built as a
+dependency of foo, but not bar1.
+
+$ go run example.go   # creates build/build.ninja
+$ cd build
+$ ninja               # builds foo and bar2, but not bar1
+$ ninja clean         # cleans up ninja build artifacts
+$ cd ..
